@@ -17,7 +17,10 @@ dbconnect();
 
 //routes
 import vehicleRoutes from "./routes/vehicle.routes.js";
+import productRoutes from "./routes/product.routes.js";
+
 app.use('/api/vehicles', vehicleRoutes);
+app.use('/api/products', productRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
