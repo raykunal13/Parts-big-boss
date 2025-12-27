@@ -10,7 +10,7 @@ export interface HeroSlideData {
 export const heroSlides: HeroSlideData[] = [
   {
     id: 1,
-    image: "/brake-system.jpg",
+    image: "/top-view-hard-disk-with-white-light.jpg",
     alt: "Automobile brake system components",
     href: "/category/brakes",
     title: "Brake System Parts",
@@ -18,7 +18,7 @@ export const heroSlides: HeroSlideData[] = [
   },
   {
     id: 2,
-    image: "/engine-component.jpg",
+    image: "/close-up-car-engine.jpg",
     alt: "Automotive engine components",
     href: "/category/engine-parts",
     title: "Engine Components",
@@ -26,7 +26,7 @@ export const heroSlides: HeroSlideData[] = [
   },
   {
     id: 3,
-    image: "/suspension-image.webp",
+    image: "/detail-shot-wheel.jpg",
     alt: "Vehicle suspension system",
     href: "/category/suspension",
     title: "Suspension Systems",

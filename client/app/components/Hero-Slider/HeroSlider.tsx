@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence } from "framer-motion";
-import HeroSlide from "./HeroSlide";
+import HeroSlide from "../Sections/HeroSlide";
 import { heroSlides } from "./heroSlider.data";
 import { autoplayTiming, breakpoints } from "./heroSlider.config";
 
@@ -70,7 +70,7 @@ export default function HeroSlider() {
         group relative w-full overflow-hidden
         mt-8 md:mt-12 lg:mt-16
         h-[45vh] md:h-[50vh] lg:h-[55vh]
-        shadow-2xl
+        
         bg-surface 
       "
       onMouseEnter={() => !isMobile && setIsHovering(true)}

@@ -6,4 +6,6 @@ export interface Product {
   image_url: string;
   category: string;
   slug: string;
+  rating: number;
+  rating_count: number;
 }
