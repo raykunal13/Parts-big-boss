@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import seedVehicles from "./seed.js";
 import syncMeili from "./syncmeili.js";
+import {syncInventoryToRedis} from "./syncInventory.js";
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -45,13 +46,8 @@ async function buildDatabase() {
     await seedVehicles();
     await meiliClient.deleteIndex("products"); // or deleteAllDocuments
     await configureMeili(); // searchable + filterable
-    const some = await meiliClient.getIndexes()
-    console.log(some)
+    await syncInventoryToRedis();
     await syncMeili();
-  
-
-    const some2 = await index.search("Pre")
-    console.log(some2)
   } catch (err) {
     console.error("❌ Error:", err);
   } finally {

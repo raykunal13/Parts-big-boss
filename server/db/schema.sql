@@ -74,7 +74,27 @@ CREATE TABLE IF NOT EXISTS product_vehicle_fitment (
 );
 
 -- ==========================================
--- 5. USERS & AUTHENTICATION
+-- 5. ORDERS & ORDER ITEMS
+-- ==========================================
+CREATE TABLE IF NOT EXISTS orders (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
+    total_amount INTEGER NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending', -- 'pending', 'paid', 'shipped', 'cancelled'
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS order_items (
+    id BIGSERIAL PRIMARY KEY,
+    order_id BIGINT REFERENCES orders(id) ON DELETE CASCADE,
+    product_id BIGINT REFERENCES products(id) ON DELETE SET NULL,
+    quantity INTEGER NOT NULL,
+    price_at_purchase INTEGER NOT NULL
+);
+
+-- ==========================================
+-- 6. USERS & AUTHENTICATION
 -- ==========================================
 
 -- 1. The Base User Table (Common to Everyone)
