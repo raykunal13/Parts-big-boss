@@ -2,16 +2,11 @@ import { pool } from "../db/db.js";
 import redisClient from "../db/redisClient.js";
 import AppError from "../utils/appError.js";
 
-/**
- * Core Order Processing Logic
- * @param {number} userId - The ID of the user
- * @param {Array} items - Array of { productId, quantity, price }
- * @param {boolean} clearCart - Whether to clear the user's Redis cart after success
- */
 export const processOrderTransaction = async (
   userId,
   items,
-  clearCart = false
+  clearCart = false,
+  addressId
 ) => {
   const client = await pool.connect();
 
@@ -22,11 +17,9 @@ export const processOrderTransaction = async (
     for (const item of items) {
       const stockKey = `product:${item.productId}:stock`;
 
-      // Check if stock key exists in Redis
       const exists = await redisClient.exists(stockKey);
 
       if (!exists) {
-        // Fallback: Fetch from DB
         const { rows } = await pool.query(
           "SELECT stock_count FROM products WHERE id = $1",
           [item.productId]
@@ -34,16 +27,13 @@ export const processOrderTransaction = async (
         if (rows.length === 0)
           throw new AppError(`Product ID ${item.productId} not found`, 404);
 
-        // Set Redis Stock (with expiry to keep it fresh-ish, e.g., 1 hour)
         await redisClient.set(stockKey, rows[0].stock_count, "EX", 3600);
       }
 
       const newStock = await redisClient.decrby(stockKey, item.quantity);
 
       if (newStock < 0) {
-        // Rollback this item
         await redisClient.incrby(stockKey, item.quantity);
-        // Rollback previous items
         for (const reserved of reservedItems) {
           await redisClient.incrby(
             `product:${reserved.productId}:stock`,
@@ -63,10 +53,10 @@ export const processOrderTransaction = async (
       0
     );
 
-    // Create Order
     const orderRes = await client.query(
-      `INSERT INTO orders (user_id, total_amount, status) VALUES ($1, $2, 'pending') RETURNING id`,
-      [userId, totalAmount]
+      `INSERT INTO orders (user_id, total_amount, status, address_id) 
+   VALUES ($1, $2, 'pending', $3) RETURNING id`,
+      [userId, totalAmount, addressId]
     );
     const orderId = orderRes.rows[0].id;
 
@@ -90,8 +80,6 @@ export const processOrderTransaction = async (
   } catch (error) {
     await client.query("ROLLBACK");
 
-    // Compensation Logic: Restore Redis Stock if DB failed
-    // (Only if it wasn't a stock error)
     if (items.length > 0 && !error.message.includes("out of stock")) {
       for (const item of items) {
         await redisClient.incrby(

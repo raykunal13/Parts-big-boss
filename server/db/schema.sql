@@ -84,6 +84,8 @@ CREATE TABLE IF NOT EXISTS orders (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+ALTER TABLE orders 
+ADD COLUMN IF NOT EXISTS address_id BIGINT REFERENCES user_addresses(id);
 
 CREATE TABLE IF NOT EXISTS order_items (
     id BIGSERIAL PRIMARY KEY,
@@ -130,6 +132,24 @@ CREATE TABLE IF NOT EXISTS dealers (
     is_verified BOOLEAN DEFAULT FALSE
 );
 
+
+-- ==========================================
+-- 7. USER ADDRESSES
+-- ==========================================
+CREATE TABLE IF NOT EXISTS user_addresses (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+    address_line1 TEXT NOT NULL,
+    address_line2 TEXT,
+    city TEXT NOT NULL,
+    state TEXT NOT NULL,
+    postal_code TEXT NOT NULL,
+    country TEXT NOT NULL DEFAULT 'India',
+    is_default BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Update Orders table to link to an address
 -- ==========================================
 -- 6. INDEXES (Speed Optimization)
 -- ==========================================
