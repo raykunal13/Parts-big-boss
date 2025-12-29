@@ -13,12 +13,14 @@ interface User {
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
+  activeAuthTab: 'customer' | 'merchant';
 }
 
 // Initial State
 let authState: AuthState = {
   user: null,
   isAuthenticated: false,
+  activeAuthTab: 'customer',
 };
 
 const listeners = new Set<() => void>();
@@ -27,8 +29,14 @@ const listeners = new Set<() => void>();
 export const authStore = {
   get: () => authState,
   
+  setAuthTab: (tab: 'customer' | 'merchant') => {
+    authState = { ...authState, activeAuthTab: tab };
+    emitChange();
+  },
+
   login: (user: User) => {
     authState = {
+      ...authState,
       user,
       isAuthenticated: true,
     };
@@ -37,6 +45,7 @@ export const authStore = {
 
   logout: () => {
     authState = {
+      ...authState,
       user: null,
       isAuthenticated: false,
     };
@@ -57,10 +66,14 @@ function emitChange() {
 }
 
 // Server Snapshot
-const getServerSnapshot = (): AuthState => ({
+// Server Snapshot
+const serverSnapshot: AuthState = {
   user: null,
   isAuthenticated: false,
-});
+  activeAuthTab: 'customer',
+};
+
+const getServerSnapshot = (): AuthState => serverSnapshot;
 
 // Hook
 export function useAuthStore() {

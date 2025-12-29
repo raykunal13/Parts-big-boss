@@ -115,7 +115,7 @@ export default function NavItem({
     relative flex items-center gap-1 py-2 px-3
     bg-transparent
     text-md font-medium
-    text-[var(--base-dark)]
+    text-white
     transition-colors duration-200
     focus:outline-none
   "

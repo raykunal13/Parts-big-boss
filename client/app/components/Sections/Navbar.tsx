@@ -34,8 +34,8 @@ export default function Navbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100"
-          : "bg-white border-b border-gray-100"
+          ? "bg-black backdrop-blur-xl shadow-sm "
+          : "bg-black"
       }`}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -45,7 +45,7 @@ export default function Navbar() {
             <div className="flex h-9 w-9 items-center justify-center rounded-md bg-[var(--accent)] text-white font-bold">
               P
             </div>
-            <span className="hidden sm:inline font-semibold text-var(--base-dark) text-2xl">
+            <span className="hidden sm:inline font-semibold text-white text-2xl">
               PartsBigBoss
             </span>
           </Link>
@@ -75,9 +75,9 @@ export default function Navbar() {
                 className="
                   inline-flex items-center justify-center
                   rounded-lg p-2
-                  text-[var(--text-muted)]
+                  text-white
                   transition-colors
-                  hover:text-[var(--foreground)]
+                  hover:text-white
                   hover:bg-[var(--surface-hover)]
                 "
                 aria-label="Open menu"

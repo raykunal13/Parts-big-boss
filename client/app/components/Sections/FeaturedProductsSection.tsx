@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Product } from "../../types/product";
-import ProductCard from "../Products/ProductCard";
+import ProductCard from "../Products/ProductCardVertical";
 import { FEATURED_PRODUCTS } from "../../Data/productInfo";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";

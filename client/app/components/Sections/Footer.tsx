@@ -5,7 +5,7 @@ import { Facebook, Twitter, Instagram, Youtube, Mail, MapPin, Phone, ArrowRight 
 
 export default function Footer() {
   return (
-    <footer className="bg-[var(--base-dark)] text-white pt-20 pb-10 border-t border-[var(--brand-red)]/30">
+    <footer className="bg-black text-gray-700 pt-20 pb-10 border-t border-[var(--brand-red)]/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
           
@@ -15,11 +15,11 @@ export default function Footer() {
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--accent)] text-white font-bold text-2xl shadow-lg transition-transform group-hover:scale-105">
                 P
               </div>
-              <span className="font-bold text-3xl tracking-tight text-white group-hover:text-[var(--accent)] transition-colors">
+              <span className="font-bold text-3xl tracking-tight text-white group hover:text-[var(--accent)] transition-colors">
                 PartsBigBoss
               </span>
             </Link>
-            <p className="text-gray-300 text-base leading-relaxed max-w-sm">
+            <p className="text-gray-700 text-base leading-relaxed max-w-sm">
               Your trusted partner for premium automotive parts. Genuine components, unbeatable prices, and express delivery nationwide.
             </p>
             <div className="flex gap-4 pt-2">
@@ -52,7 +52,7 @@ export default function Footer() {
 
           {/* Column 2: Quick Links (Spans 2 columns) */}
           <div className="lg:col-span-2">
-            <h3 className="text-lg font-bold mb-6 text-white tracking-wide">Quick Links</h3>
+            <h3 className="text-lg font-bold mb-6 text-white hover:text-gray-400 tracking-wide">Quick Links</h3>
             <ul className="space-y-4 text-sm text-gray-300">
               <li><FooterLink href="/about">About Us</FooterLink></li>
               <li><FooterLink href="/contact">Contact Support</FooterLink></li>
@@ -65,7 +65,7 @@ export default function Footer() {
 
           {/* Column 3: Top Categories (Spans 3 columns) */}
           <div className="lg:col-span-3">
-            <h3 className="text-lg font-bold mb-6 text-white tracking-wide">Top Categories</h3>
+            <h3 className="text-lg font-bold mb-6 text-white tracking-wide hover:text-gray-400">Top Categories</h3>
             <ul className="space-y-4 text-sm text-gray-300">
               <li><FooterLink href="/parts/engine">Engine & Performance</FooterLink></li>
               <li><FooterLink href="/parts/brakes">Brake Systems</FooterLink></li>
@@ -79,25 +79,25 @@ export default function Footer() {
           {/* Column 4: Contact & Newsletter (Spans 3 columns) */}
           <div className="lg:col-span-3 space-y-8">
             <div>
-              <h3 className="text-lg font-bold mb-6 text-white tracking-wide">Contact Us</h3>
+              <h3 className="text-lg font-bold mb-6 text-white tracking-wide hover:text-gray-400">Contact Us</h3>
               <ul className="space-y-4 text-sm text-gray-300">
                 <li className="flex items-start gap-4">
                   <div className="mt-1 p-1 bg-white/5 rounded-full text-[var(--accent)]">
                     <MapPin size={16} />
                   </div>
-                  <span className="leading-relaxed">123 Auto Market Rd, Sector 48,<br />Gurugram, Haryana 122001</span>
+                  <span className="leading-relaxed text-gray-600">123 Auto Market Rd, Sector 48,<br />Gurugram, Haryana 122001</span>
                 </li>
                 <li className="flex items-center gap-4">
                   <div className="p-1 bg-white/5 rounded-full text-[var(--accent)]">
                     <Phone size={16} />
                   </div>
-                  <span className="font-medium">+91 98765 43210</span>
+                  <span className="font-medium text-gray-600">+91 98765 43210</span>
                 </li>
                 <li className="flex items-center gap-4">
                   <div className="p-1 bg-white/5 rounded-full text-[var(--accent)]">
                     <Mail size={16} />
                   </div>
-                  <span className="font-medium">support@partsbigboss.com</span>
+                  <span className="font-medium text-gray-600">support@partsbigboss.com</span>
                 </li>
               </ul>
             </div>
@@ -128,9 +128,9 @@ export default function Footer() {
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
           <p>&copy; {new Date().getFullYear()} PartsBigBoss. All rights reserved.</p>
           <div className="flex flex-wrap justify-center gap-8">
-            <Link href="#" className="hover:text-white transition-colors">Sitemap</Link>
-            <Link href="#" className="hover:text-white transition-colors">Cookie Policy</Link>
-            <Link href="#" className="hover:text-white transition-colors">Privacy Settings</Link>
+            <Link href="#" className="text:white hover:text-gray-400 ">Sitemap</Link>
+            <Link href="#" className="text:white hover:text-gray-400 transition-colors">Cookie Policy</Link>
+            <Link href="#" className="text:white hover:text-gray-400 transition-colors">Privacy Settings</Link>
           </div>
         </div>
       </div>
@@ -146,7 +146,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
       className="group flex items-center gap-2 hover:text-white transition-colors duration-200"
     >
       <span className="h-1 w-1 rounded-full bg-[var(--accent)] opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
-      <span className="group-hover:translate-x-1 transition-transform duration-300">
+      <span className="group-hover:translate-x-1 transition-transform duration-300 text-gray-700">
         {children}
       </span>
     </Link>

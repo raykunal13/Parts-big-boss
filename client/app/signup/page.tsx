@@ -1,13 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import CustomerSignup from "./CustomerSignup";
 import MerchantSignup from "./MerchantSignup";
 import SignupStyles from "./SignupStyles";
+import { useAuthStore, authStore } from "../store/useAuthStore";
 
 export default function SignupPage() {
-  const [signupType, setSignupType] = useState<'customer' | 'merchant'>('customer');
+  const { activeAuthTab } = useAuthStore();
+  
+  const handleTabChange = (type: 'customer' | 'merchant') => {
+    authStore.setAuthTab(type);
+  }
 
   return (
     <div className="min-h-screen w-full flex bg-[var(--background)]">
@@ -33,25 +37,25 @@ export default function SignupPage() {
                 className="absolute inset-y-1 bg-[var(--background)] rounded-xl shadow-sm transition-all duration-300 ease-spring"
                 style={{
                    width: 'calc(50% - 4px)',
-                   left: signupType === 'customer' ? '4px' : 'calc(50%)'
+                   left: activeAuthTab === 'customer' ? '4px' : 'calc(50%)'
                 }}
               />
               <button
-                onClick={() => setSignupType('customer')}
-                className={`flex-1 relative z-10 py-2.5 text-sm font-semibold rounded-xl transition-colors duration-200 ${signupType === 'customer' ? 'text-[var(--foreground)]' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'}`}
+                onClick={() => handleTabChange('customer')}
+                className={`flex-1 relative z-10 py-2.5 text-sm font-semibold rounded-xl transition-colors duration-200 ${activeAuthTab === 'customer' ? 'text-[var(--foreground)]' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'}`}
               >
                 Customer
               </button>
               <button
-                onClick={() => setSignupType('merchant')}
-                className={`flex-1 relative z-10 py-2.5 text-sm font-semibold rounded-xl transition-colors duration-200 ${signupType === 'merchant' ? 'text-[var(--foreground)]' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'}`}
+                onClick={() => handleTabChange('merchant')}
+                className={`flex-1 relative z-10 py-2.5 text-sm font-semibold rounded-xl transition-colors duration-200 ${activeAuthTab === 'merchant' ? 'text-[var(--foreground)]' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'}`}
               >
                 Merchant
               </button>
             </div>
           </div>
 
-          {signupType === 'customer' ? <CustomerSignup /> : <MerchantSignup />}
+          {activeAuthTab === 'customer' ? <CustomerSignup /> : <MerchantSignup />}
 
         </div>
       </div>

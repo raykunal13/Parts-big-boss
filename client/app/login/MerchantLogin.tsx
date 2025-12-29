@@ -43,7 +43,7 @@ export default function MerchantLogin() {
     setTimeout(() => {
       setIsVerifying(false);
       setIsPhoneVerified(true);
-    }, 1500);
+    }, 1000);
   };
 
   const handleOtpChange = (index: number, value: string) => {
@@ -392,7 +392,7 @@ export default function MerchantLogin() {
       <p className="text-center text-sm text-[var(--text-secondary)]">
         Want to become a merchant?{" "}
         <Link 
-          href="/merchant/signup" 
+          href="/signup" 
           className="font-bold text-[var(--accent)] hover:underline"
         >
           Sign up for free

@@ -4,18 +4,13 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { User, LogOut, ShoppingBag } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAuthStore, authStore } from "../../store/useAuthStore";
 
 export default function AccountButton() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { isAuthenticated } = useAuthStore();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-
-  // Check authentication status (replace with actual auth check)
-  useEffect(() => {
-    // TODO: Replace with actual authentication check (e.g., checking token/session)
-    setIsAuthenticated(true);
-  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -50,10 +45,9 @@ export default function AccountButton() {
   }, [isOpen]);
 
   const handleLogout = () => {
-    // TODO: Implement actual logout logic
-    console.log("Logout clicked");
+    authStore.logout();
     setIsOpen(false);
-    setIsAuthenticated(false);
+    router.push("/");
   };
 
   const handleLoginClick = () => {
@@ -64,7 +58,7 @@ export default function AccountButton() {
     return (
       <div
         onClick={handleLoginClick}
-        className="hidden lg:flex items-center justify-center p-2 rounded-lg transition-colors duration-200 group text-black cursor-pointer hover:bg-[var(--surface-hover)]"
+        className="hidden lg:flex items-center justify-center p-2 rounded-lg transition-colors duration-200 group text-white cursor-pointer hover:text-black hover:bg-[var(--surface-hover)]"
         aria-label="Sign in"
       >
         <User

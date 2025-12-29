@@ -10,7 +10,7 @@ export default function CartButton() {
   return (
     <Link
       href="/cart"
-      className="relative p-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors duration-200 group"
+      className="relative p-2 text-white hover:text-black hover:bg-[var(--surface-hover)] rounded-lg transition-colors duration-200 group"
       aria-label={`Shopping cart with ${cartCount} items`}
     >
       <ShoppingCart

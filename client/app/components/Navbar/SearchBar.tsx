@@ -85,9 +85,10 @@ export default function SearchBar() {
             className="
               inline-flex items-center justify-center
               rounded-lg p-2
-              text-gray-600
-              hover:text-gray-900
-              hover:bg-gray-100
+              text-white
+              hover:text-black
+              hover:bg-[var(--surface-hover)] 
+              hover:rounded-full
               transition-colors
               flex-shrink-0 cursor-pointer
             "
