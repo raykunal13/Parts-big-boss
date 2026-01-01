@@ -45,14 +45,14 @@ export default function CategoryGrid() {
     <section className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900">Shop by Category</h2>
-            <p className="mt-2 text-gray-600">Find the exact parts for your system</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Shop by Category</h2>
+            <p className="mt-2 text-sm md:text-base text-gray-600">Find the exact parts for your system</p>
           </div>
           <Link 
             href="/categories" 
-            className="hidden md:flex items-center text-[var(--accent)] font-semibold hover:text-[var(--accent-hover)] transition-colors"
+            className="flex items-center text-sm md:text-base text-[var(--accent)] font-semibold hover:text-[var(--accent-hover)] transition-colors"
           >
             View All Categories <ArrowRight className="ml-2 w-4 h-4" />
           </Link>

@@ -1,164 +1,227 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2, Edit2, CheckCircle2, Zap, ArrowRight, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
+import { 
+  Car, 
+  Plus, 
+  AlertTriangle, 
+  CheckCircle2, 
+  Wrench, 
+  ShoppingCart,
+  Zap,
+  MoreVertical
+} from "lucide-react";
 import Link from "next/link";
+import { useAuthStore, authStore } from "../store/useAuthStore";
+import VehicleSelector from "../components/Sections/VehicleSelector"; 
 
-export default function MyGarage() {
-  const [shopForCar, setShopForCar] = useState(true);
+export default function ProfileDashboard() {
 
-  // Mock Data
-  const vehicles = [
-    { id: 1, name: "2018 Hyundai Creta", engine: "1.6L Diesel CRDi", trim: "SX Option", primary: true, image: "/Category/categ1.png", color: "Polar White" },
-    { id: 2, name: "2021 Royal Enfield", engine: "350cc", trim: "Classic", primary: false, image: "/Category/categ2.png", color: "Stealth Black" },
-  ];
+  const { userGarage, activeVehicle } = useAuthStore();
+  const [isAddingCar, setIsAddingCar] = useState(false);
+
+  // Helper to handle switching the "Active Context"
+  const handleSwitchVehicle = (vehicleId: number) => {
+    // In a real app, this would call the API first
+    authStore.switchActiveVehicle(vehicleId); 
+    console.log("Switching active vehicle to:", vehicleId);
+  };
 
   return (
-    <motion.div 
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        className="space-y-8"
-    >
+    <div className="space-y-8">
       
-      {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2">
+      {/* 1. THE HEADER (Welcome & Status) */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-[var(--foreground)] mb-2">My Garage</h1>
-          <p className="text-[var(--text-muted)] text-lg">Manage your fleet and fitment preferences.</p>
+          <h1 className="text-3xl font-bold text-[var(--foreground)]">Command Center</h1>
+          <p className="text-[var(--text-secondary)]">Manage your vehicles and fitment profile</p>
         </div>
-        <motion.button 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 bg-[var(--foreground)] text-white px-6 py-3 rounded-2xl shadow-lg shadow-black/10 hover:shadow-xl hover:bg-black transition-all"
-        >
-          <Plus size={18} /> 
-          <span className="font-semibold">Add Vehicle</span>
-        </motion.button>
-      </div>
-
-      {/* Primary Vehicle Hero Card */}
-      <div className="relative overflow-hidden rounded-[2.5rem] bg-white border border-gray-100 shadow-2xl shadow-gray-200/50 group">
         
-        {/* Dynamic Background Gradients */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-red-500/10 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-gradient-to-tr from-blue-500/5 to-transparent rounded-full blur-3xl translate-y-1/3 -translate-x-1/4 pointer-events-none" />
+        {/* Global Garage Status */}
+        <div className="flex items-center gap-4 bg-white px-4 py-2 rounded-xl border border-[var(--border)] shadow-sm">
+           <div className="text-right">
+             <p className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wider">Garage Level</p>
+             <p className="text-sm font-bold text-[var(--accent)]">Enthusiast (Lvl 2)</p>
+           </div>
+           <div className="h-10 w-10 rounded-full bg-[var(--surface-hover)] flex items-center justify-center text-[var(--accent)]">
+             <Zap size={20} fill="currentColor" />
+           </div>
+        </div>
+      </div>
 
-        <div className="relative p-8 lg:p-12 flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
-          
-          {/* Car Image Area */}
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="relative w-full lg:w-1/2 aspect-[16/9] lg:aspect-[4/3] flex items-center justify-center"
-          >
-             {/* Glowing backdrop behind car */}
-             <div className="absolute inset-0 bg-gradient-to-b from-gray-100/50 to-gray-50 rounded-3xl -z-10" />
-             <div className="relative z-10 w-full h-full flex items-center justify-center p-6 mix-blend-multiply">
-                 {/* Fallback if image fails or just use the div as present in original, but try Image first */}
-                 <div className="w-full h-full rounded-2xl flex items-center justify-center relative transform group-hover:scale-105 transition-transform duration-700 ease-out">
-                    <img src={vehicles[0].image} alt={vehicles[0].name} className="object-contain w-full h-full drop-shadow-2xl" />
-                 </div>
-             </div>
-          </motion.div>
+      {/* 2. ACTIVE CONTEXT CARD (The "Ignition Switch") */}
+      {activeVehicle ? (
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative overflow-hidden rounded-2xl bg-[var(--foreground)] text-[var(--background)] p-6 md:p-8 shadow-2xl shadow-black/20"
+        >
+          {/* Background Decoration */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
 
-          {/* Info Area */}
-          <div className="flex-1 w-full space-y-8">
+          <div className="relative z-10 flex flex-col md:flex-row gap-6 justify-between">
             <div className="space-y-4">
-                <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-green-50 text-green-700 border border-green-100 shadow-sm">
-                        <CheckCircle2 size={14} /> Primary
-                    </div>
-                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-100 shadow-sm">
-                        <ShieldCheck size={14} /> Verified Fit
-                    </div>
-                </div>
-                
-                <div>
-                    <h2 className="text-4xl lg:text-5xl font-black text-[var(--foreground)] tracking-tight leading-none mb-2">
-                        {vehicles[0].name}
-                    </h2>
-                    <p className="text-xl text-[var(--text-secondary)] font-medium">
-                        {vehicles[0].trim} <span className="text-gray-300 mx-2">|</span> {vehicles[0].engine}
-                    </p>
-                </div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-bold uppercase tracking-wider border border-green-500/20">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </span>
+                Active Vehicle
+              </div>
+              
+              <div>
+                <h2 className="text-3xl font-bold text-white mb-1">
+                  {activeVehicle.nickname || `${activeVehicle.year} ${activeVehicle.model_name}`}
+                </h2>
+                <p className="text-white/60 font-mono text-sm">
+                  {activeVehicle.make_name} • {activeVehicle.variant_name}
+                </p>
+              </div>
+
+              {/* Fitment Health Check */}
+              <div className="flex items-center gap-3 text-sm">
+                {activeVehicle.fitment_completeness >= 80 ? (
+                   <div className="flex items-center gap-2 text-green-400">
+                     <CheckCircle2 size={16} />
+                     <span>Fitment Profile Healthy</span>
+                   </div>
+                ) : (
+                   <div className="flex items-center gap-2 text-orange-400">
+                     <AlertTriangle size={16} />
+                     <span>Missing Engine Details (Risk of Return)</span>
+                   </div>
+                )}
+              </div>
             </div>
 
-            <div className="h-px w-full bg-gradient-to-r from-gray-200 to-transparent" />
-
-            {/* Actions Panel */}
-            <div className="bg-gray-50/80 backdrop-blur-sm rounded-3xl p-6 border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-6 transition-colors hover:bg-gray-50/50 shadow-sm">
-                {/* Custom Toggle */}
-                <label className="flex items-center gap-4 cursor-pointer group/toggle select-none">
-                    <div className="relative">
-                        <input type="checkbox" checked={shopForCar} onChange={() => setShopForCar(!shopForCar)} className="sr-only peer" />
-                        <div className="w-14 h-8 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:bg-[var(--accent)] transition-all duration-300 shadow-inner"></div>
-                        <div className="absolute top-[4px] left-[4px] bg-white w-6 h-6 rounded-full shadow-md transition-all duration-300 peer-checked:translate-x-6 flex items-center justify-center">
-                            {shopForCar && <Zap size={12} className="text-[var(--accent)]" />}
-                        </div>
-                    </div>
-                    <div>
-                        <span className="block text-sm font-bold text-[var(--foreground)]">Shop for this car</span>
-                        <span className="block text-xs text-[var(--text-muted)]">Parts will match this model</span>
-                    </div>
-                </label>
-
-                <div className="flex items-center gap-2">
-                    <button className="p-3 text-[var(--text-secondary)] hover:bg-white hover:text-[var(--foreground)] hover:shadow-md rounded-2xl transition-all border border-transparent hover:border-gray-100">
-                        <Edit2 size={20} />
-                    </button>
-                    <button className="p-3 text-[var(--text-secondary)] hover:bg-white hover:text-red-600 hover:shadow-md rounded-2xl transition-all border border-transparent hover:border-red-50">
-                        <Trash2 size={20} />
-                    </button>
-                </div>
+            {/* Quick Actions for Active Car */}
+            <div className="flex flex-col gap-3 min-w-[200px]">
+               <Link href={`/search?vehicle=${activeVehicle.id}`} className="flex items-center justify-center gap-2 bg-white text-black px-6 py-3 rounded-xl font-bold hover:bg-white/90 transition-colors">
+                  <ShoppingCart size={18} /> Shop Parts
+               </Link>
+               <button className="flex items-center justify-center gap-2 bg-white/10 text-white px-6 py-3 rounded-xl font-medium hover:bg-white/20 transition-colors backdrop-blur-sm">
+                  <Wrench size={18} /> Service Log
+               </button>
             </div>
-
           </div>
+        </motion.div>
+      ) : (
+        /* Empty Active State */
+        <div className="p-8 rounded-2xl bg-orange-50 border border-orange-100 flex flex-col items-center text-center space-y-4">
+           <div className="p-3 bg-orange-100 text-orange-600 rounded-full">
+             <AlertTriangle size={24} />
+           </div>
+           <div>
+             <h3 className="text-lg font-bold text-orange-900">No Active Vehicle Selected</h3>
+             <p className="text-sm text-orange-700 max-w-md mx-auto">
+               Select a vehicle to unlock accurate fitment filtering and guaranteed part compatibility.
+             </p>
+           </div>
+        </div>
+      )}
+
+      {/* 3. MY GARAGE GRID (The Asset List) */}
+      <div className="space-y-4">
+        <h3 className="text-xl font-bold text-[var(--foreground)]">My Garage</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          
+          {/* Existing Cars */}
+          {userGarage.map((car) => (
+            <div 
+              key={car.id} 
+              className={`
+                group relative p-5 rounded-2xl border transition-all duration-300
+                ${car.is_active 
+                  ? "bg-[var(--surface-hover)] border-[var(--accent)] ring-1 ring-[var(--accent)]" 
+                  : "bg-white border-[var(--border)] hover:border-[var(--text-secondary)] hover:shadow-md"
+                }
+              `}
+            >
+              <div className="flex justify-between items-start mb-4">
+                <div className="h-10 w-10 rounded-lg bg-[var(--surface)] flex items-center justify-center text-[var(--foreground)]">
+                  <Car size={20} />
+                </div>
+                {car.is_active ? (
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--accent)] bg-red-50 px-2 py-1 rounded-md">Active</span>
+                ) : (
+                  <button 
+                    onClick={() => handleSwitchVehicle(car.id)}
+                    className="text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--foreground)] underline decoration-dotted underline-offset-4"
+                  >
+                    Switch to this
+                  </button>
+                )}
+              </div>
+
+              <div>
+                <h4 className="font-bold text-[var(--foreground)] truncate">{car.nickname || car.model_name}</h4>
+                <p className="text-xs text-[var(--text-muted)] font-mono mt-1">{car.variant_name}</p>
+              </div>
+
+              {/* Fitment Bar */}
+              <div className="mt-4 space-y-1.5">
+                 <div className="flex justify-between text-[10px] font-medium text-[var(--text-secondary)]">
+                   <span>Profile Completeness</span>
+                   <span>{car.fitment_completeness}%</span>
+                 </div>
+                 <div className="h-1.5 w-full bg-[var(--surface)] rounded-full overflow-hidden">
+                   <div 
+                     className={`h-full rounded-full ${car.fitment_completeness === 100 ? "bg-green-500" : "bg-orange-400"}`} 
+                     style={{ width: `${car.fitment_completeness}%` }}
+                   />
+                 </div>
+              </div>
+            </div>
+          ))}
+
+          {/* Add New Vehicle Card */}
+          <button 
+            onClick={() => setIsAddingCar(true)}
+            className="flex flex-col items-center justify-center gap-3 p-5 rounded-2xl border-2 border-dashed border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-red-50/10 transition-all min-h-[180px]"
+          >
+            <div className="h-12 w-12 rounded-full bg-[var(--surface)] group-hover:bg-white flex items-center justify-center transition-colors">
+              <Plus size={24} />
+            </div>
+            <span className="font-medium text-sm">Add Another Vehicle</span>
+          </button>
+
         </div>
       </div>
 
-      {/* Secondary Grid */}
-      <div className="pt-8">
-        <h3 className="text-2xl font-bold text-[var(--foreground)] mb-6">Other Machines</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            
-            {/* Secondary Car Card */}
-            <motion.div 
-                whileHover={{ y: -5 }}
-                className="p-6 rounded-[2rem] bg-white border border-gray-100 shadow-sm hover:shadow-xl hover:border-[var(--accent)]/30 transition-all cursor-pointer group flex items-start gap-5 relative overflow-hidden"
-            >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-gray-50/50 opacity-0 group-hover:opacity-100 transition-opacity" />
-                
-                <div className="h-24 w-32 bg-gray-50 rounded-2xl flex-shrink-0 flex items-center justify-center p-2 relative z-10 transition-transform group-hover:scale-105 border border-gray-100">
-                    <img src={vehicles[1].image} alt={vehicles[1].name} className="object-contain w-full h-full opacity-90 group-hover:opacity-100 transition-opacity" />
-                </div>
-                
-                <div className="flex-1 relative z-10 pt-1">
-                    <h4 className="font-bold text-xl text-[var(--foreground)] leading-tight mb-1">{vehicles[1].name}</h4>
-                    <p className="text-sm text-[var(--text-muted)] font-medium mb-3">{vehicles[1].engine}</p>
-                    
-                    <div className="flex items-center text-xs font-bold text-[var(--accent)] opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
-                        MANAGE <ArrowRight size={14} className="ml-1" />
-                    </div>
-                </div>
-            </motion.div>
-
-            {/* Add New Slot */}
-            <motion.button 
-                whileHover={{ scale: 1.02, backgroundColor: "rgba(249, 250, 251, 1)" }}
-                whileTap={{ scale: 0.98 }}
-                className="p-6 rounded-[2rem] border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-4 text-[var(--text-muted)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all bg-transparent min-h-[160px]"
-            >
-                <div className="h-12 w-12 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-[var(--accent)]/10 transition-colors">
-                    <Plus size={24} />
-                </div>
-                <span className="font-bold text-lg">Add Another Vehicle</span>
-            </motion.button>
-        </div>
+      {/* 4. BUY AGAIN SHELF (Placeholder for Phase 3) */}
+      <div className="pt-4 border-t border-[var(--border)]">
+         <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-[var(--foreground)]">Quick Reorder</h3>
+            <span className="text-xs text-[var(--text-muted)]">Based on your maintenance history</span>
+         </div>
+         
+         <div className="flex items-center justify-center p-8 bg-[var(--surface)] rounded-xl border border-dashed border-[var(--border)]">
+             <div className="text-center space-y-2">
+                <Wrench className="mx-auto text-[var(--text-muted)]" size={24} />
+                <p className="text-sm text-[var(--text-secondary)]">No maintenance history found yet.</p>
+                <p className="text-xs text-[var(--text-muted)]">Items like Oil, Filters, and Wipers will appear here after your first purchase.</p>
+             </div>
+         </div>
       </div>
 
-    </motion.div>
+      {/* Add Vehicle Modal Placeholder */}
+      {/* You would wrap your VehicleSelector component in a standardized Modal here */}
+      {isAddingCar && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+           <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-2xl">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-bold text-lg">Add to Garage</h3>
+                <button onClick={() => setIsAddingCar(false)} className="text-gray-400 hover:text-black">Close</button>
+              </div>
+              <div className="mt-2 text-left">
+                 <VehicleSelector />
+              </div>
+           </div>
+        </div>
+      )}
+
+    </div>
   );
 }

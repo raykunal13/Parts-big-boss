@@ -16,11 +16,11 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
   ];
 
   return (
-   <div className="min-h-screen flex flex-row bg-[#FDFDF]">
+   <div className="min-h-screen flex flex-col lg:flex-row bg-[#FDFDFD]">
 
-  {/* SIDEBAR SECTION — ALWAYS VERTICALLY CENTERED */}
-  <aside className="w-full lg:w-80 xl:w-96 flex-shrink-0 flex justify-center">
-    <div className="flex flex-col justify-center h-full w-full px-4 sm:px-6">
+  {/* SIDEBAR SECTION — ALWAYS VERTICALLY CENTERED on Desktop, Standard on Mobile */}
+  <aside className="w-full lg:w-80 xl:w-96 flex-shrink-0 flex justify-center lg:h-screen lg:sticky lg:top-0">
+    <div className="flex flex-col justify-center h-full w-full px-4 sm:px-6 py-6 lg:py-0">
 
       {/* Profile Summary */}
       <motion.div
@@ -118,7 +118,7 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
-      className="pt-12 px-6"
+      className="pt-6 px-4 lg:pt-12 lg:px-6 mb-12"
     >
       {children}
     </motion.div>

@@ -2,185 +2,191 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { vehicleCategoryInfo } from "../../Data/vehicleCategoryInfo";
+import { vehicleCategoryInfo } from "../../Data/vehicleCategoryInfo"; // Note: I fixed your path import
 import { Make, Model } from "../../types/vehicle";
+import { Loader2 } from "lucide-react";
 
-// Simple Chevron Icon component to keep the main code clean
-const ChevronIcon = () => (
-  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      width="20" 
-      height="20" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round"
-    >
-      <path d="m6 9 6 6 6-6"/>
-    </svg>
-  </div>
-);
+// Define the selection object
+export interface VehicleSelection {
+  makeId: string;
+  modelId: string;
+  year: string;
+  makeName?: string;
+  modelName?: string;
+}
 
-export default function VehicleSelector() {
+interface VehicleSelectorProps {
+  initialMakes?: Make[]; // Passed from Server
+  onConfirm?: (selection: VehicleSelection) => void; // Optional: Overrides navigation
+  variant?: "hero" | "modal"; // For styling differences
+}
+
+export default function VehicleSelector({ 
+  initialMakes = [], 
+  onConfirm,
+  variant = "hero" 
+}: VehicleSelectorProps) {
   const router = useRouter();
 
-  // State Management
-  const [makes, setMakes] = useState<Make[]>([]);
+  // State
+  const [makes, setMakes] = useState<Make[]>(initialMakes);
   const [models, setModels] = useState<Model[]>([]);
   const [years, setYears] = useState<number[]>([]);
 
   const [selectedMake, setSelectedMake] = useState("");
   const [selectedModel, setSelectedModel] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
-
+  
   const [isLoadingModels, setIsLoadingModels] = useState(false);
+  const [isLoadingYears, setIsLoadingYears] = useState(false);
 
-  // 1. Fetch Makes on Mount
+  // 1. Fallback: If no initialMakes provided (e.g., used deep in client tree), fetch them
   useEffect(() => {
-    const loadMakes = async () => {
-      const data = await vehicleCategoryInfo.getMakes();
-      setMakes(data);
-    };
-    loadMakes();
-  }, []);
+    if (initialMakes.length === 0) {
+      const loadMakes = async () => {
+        const data = await vehicleCategoryInfo.getMakes();
+        setMakes(data);
+      };
+      loadMakes();
+    }
+  }, [initialMakes]);
 
-  // 2. Fetch Models when Make changes
+  // 2. Fetch Models
   useEffect(() => {
     if (!selectedMake) {
       setModels([]);
       setSelectedModel("");
-      setSelectedYear("");
       return;
     }
-
     const loadModels = async () => {
       setIsLoadingModels(true);
-      try {
-        const data = await vehicleCategoryInfo.getModels(Number(selectedMake));
-        setModels(data);
-      } finally {
-        setIsLoadingModels(false);
-      }
+      const data = await vehicleCategoryInfo.getModels(Number(selectedMake));
+      setModels(data);
+      setIsLoadingModels(false);
     };
-    
     loadModels();
-    // Reset downstream selections
-    setSelectedModel("");
+    setSelectedModel(""); 
     setSelectedYear("");
   }, [selectedMake]);
 
-  // 3. Fetch Years when Model changes
+  // 3. Fetch Years
   useEffect(() => {
     if (!selectedModel) {
       setYears([]);
-      setSelectedYear("");
       return;
     }
-
     const loadYears = async () => {
+      setIsLoadingYears(true);
       const data = await vehicleCategoryInfo.getYears(Number(selectedModel));
       setYears(data);
+      setIsLoadingYears(false);
     };
-
     loadYears();
-    // Reset downstream selection
     setSelectedYear("");
   }, [selectedModel]);
 
-  // Search Handler
-  const handleSearch = () => {
-    if (!selectedMake) return;
+  // Logic: Search or Callback
+  const handleSubmit = () => {
+    if (!selectedMake || !selectedModel || !selectedYear) return;
 
-    const queryParams = new URLSearchParams();
-    if (selectedMake) queryParams.append("make", selectedMake);
-    if (selectedModel) queryParams.append("model", selectedModel);
-    if (selectedYear) queryParams.append("year", selectedYear);
+    // Build the selection object
+    const selection: VehicleSelection = {
+      makeId: selectedMake,
+      modelId: selectedModel,
+      year: selectedYear,
+      // Find names for convenience (optional)
+      makeName: makes.find(m => m.id.toString() === selectedMake)?.name,
+      modelName: models.find(m => m.id.toString() === selectedModel)?.name,
+    };
 
-    router.push(`/search?${queryParams.toString()}`);
+    if (onConfirm) {
+      // Mode 1: Add to Garage (Profile)
+      onConfirm(selection);
+    } else {
+      // Mode 2: Search (Landing Page)
+      const queryParams = new URLSearchParams();
+      queryParams.append("make", selectedMake);
+      queryParams.append("model", selectedModel);
+      queryParams.append("year", selectedYear);
+      router.push(`/search?${queryParams.toString()}`);
+    }
   };
 
-  // Derived state for the button
-  const isSearchEnabled = Boolean(selectedMake);
+  const isReady = selectedMake && selectedModel && selectedYear;
+
+  // STYLES: Differentiate between Hero (Big/Shadow) and Modal (Clean)
+  const containerClass = variant === "hero" 
+    ? "bg-white border-y-2 border-gray-100 p-6 w-full max-w-6xl mx-auto my-4 shadow-sm"
+    : "w-full space-y-4"; // Modal mode is simpler
+
+  const gridClass = variant === "hero"
+    ? "grid grid-cols-1 md:grid-cols-4 gap-4"
+    : "flex flex-col gap-4"; 
 
   return (
-    <div className="bg-white border-t-2 border-b-2 p-6 w-[100%] max-w-6xl mx-auto my-4">
-      <div className="mb-6 flex items-center space-x-2">
-        <h2 className="text-center w-full text-xl font-bold text-gray-900">Find part by vehicle</h2>
-      </div>
+    <div className={containerClass}>
+      {variant === "hero" && (
+        <div className="mb-6 flex items-center space-x-2">
+          <h2 className="text-center w-full text-xl font-bold text-gray-900">Find part by vehicle</h2>
+        </div>
+      )}
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {/* Make */}
+      <div className={gridClass}>
+        {/* MAKE */}
         <div className="relative">
           <select
             value={selectedMake}
             onChange={(e) => setSelectedMake(e.target.value)}
-            className="w-full appearance-none bg-[var(--surface)] text-gray-900 border border-gray-200 rounded-lg px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent transition-all"
+            className="w-full appearance-none bg-[var(--surface)] text-gray-900 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition-all"
           >
             <option value="">Select Make</option>
             {makes.map((make) => (
-              <option key={make.id} value={make.id}>
-                {make.name}
-              </option>
+              <option key={make.id} value={make.id}>{make.name}</option>
             ))}
           </select>
-          <ChevronIcon />
         </div>
 
-        {/* Model */}
+        {/* MODEL */}
         <div className="relative">
           <select
             value={selectedModel}
             onChange={(e) => setSelectedModel(e.target.value)}
             disabled={!selectedMake || isLoadingModels}
-            className="w-full appearance-none bg-[var(--surface)] text-gray-900 border border-gray-200 rounded-lg px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent transition-all disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            className="w-full appearance-none bg-[var(--surface)] text-gray-900 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] disabled:opacity-50 disabled:bg-gray-50"
           >
-            <option value="">
-              {isLoadingModels ? "Loading..." : "Select Model"}
-            </option>
+            <option value="">{isLoadingModels ? "Loading..." : "Select Model"}</option>
             {models.map((model) => (
-              <option key={model.id} value={model.id}>
-                {model.name}
-              </option>
+              <option key={model.id} value={model.id}>{model.name}</option>
             ))}
           </select>
-          <ChevronIcon />
+          {isLoadingModels && <Loader2 className="absolute right-3 top-3.5 animate-spin text-gray-400" size={16} />}
         </div>
 
-        {/* Year */}
+        {/* YEAR */}
         <div className="relative">
           <select
             value={selectedYear}
             onChange={(e) => setSelectedYear(e.target.value)}
-            disabled={!selectedModel || years.length === 0}
-            className="w-full appearance-none bg-[var(--surface)] text-gray-900 border border-gray-200 rounded-lg px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent transition-all disabled:opacity-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            disabled={!selectedModel || isLoadingYears}
+            className="w-full appearance-none bg-[var(--surface)] text-gray-900 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] disabled:opacity-50 disabled:bg-gray-50"
           >
-            <option value="">Select Year</option>
+            <option value="">{isLoadingYears ? "Loading..." : "Select Year"}</option>
             {years.map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
+              <option key={year} value={year}>{year}</option>
             ))}
           </select>
-          <ChevronIcon />
         </div>
 
-        {/* Button */}
+        {/* ACTION BUTTON */}
         <button
-          onClick={handleSearch}
-          disabled={!isSearchEnabled}
+          onClick={handleSubmit}
+          disabled={!isReady}
           className={`
             w-full py-3 rounded-lg font-bold text-white shadow-md transition-all duration-200 flex items-center justify-center
-            ${
-              isSearchEnabled
-                ? "bg-[var(--accent)] hover:bg-[var(--accent-hover)] hover:-translate-y-0.5"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
-            }
+            ${isReady ? "bg-[var(--accent)] hover:bg-red-700 hover:-translate-y-0.5" : "bg-gray-300 cursor-not-allowed shadow-none"}
           `}
         >
-          Find Parts
+          {onConfirm ? "Add Vehicle" : "Find Parts"}
         </button>
       </div>
     </div>

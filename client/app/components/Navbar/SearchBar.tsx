@@ -17,7 +17,7 @@ export default function SearchBar() {
   const [suggestions, setSuggestions] = useState<any[]>([]);
 
   // Debounce the search query
-  const debouncedSearchQuery = useDebounce(searchQuery, 10000);
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);

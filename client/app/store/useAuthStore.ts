@@ -1,4 +1,6 @@
 import { useSyncExternalStore } from 'react';
+import { UserVehicle } from '../types/vehicle'; // Import the new type
+
 // Types
 interface User {
   id: string;
@@ -13,6 +15,10 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   activeAuthTab: 'customer' | 'merchant';
+  
+  // NEW: Vehicle State
+  userGarage: UserVehicle[];
+  activeVehicle: UserVehicle | null;
 }
 
 // Initial State
@@ -20,21 +26,25 @@ let authState: AuthState = {
   user: null,
   isAuthenticated: false,
   activeAuthTab: 'customer',
+  userGarage: [],
+  activeVehicle: null,
 };
 
-// hydrate for caching login
-export const hydrate = (user: User | null) => {
+// Hydrate: Now accepts vehicles too
+export const hydrate = (user: User | null, garage: UserVehicle[] = []) => {
+  const activeCar = garage.find(v => v.is_active) || null;
+
   authState = {
     ...authState,
     user,
     isAuthenticated: !!user,
+    userGarage: garage,
+    activeVehicle: activeCar,
   };
   emitChange();
 };
 
 const listeners = new Set<() => void>();
-// const listeners = new Set();
-
 
 // Store Implementation
 export const authStore = {
@@ -50,6 +60,9 @@ export const authStore = {
       ...authState,
       user,
       isAuthenticated: true,
+      // On fresh login, garage is empty until fetched
+      userGarage: [],
+      activeVehicle: null,
     };
     emitChange();
   },
@@ -59,6 +72,37 @@ export const authStore = {
       ...authState,
       user: null,
       isAuthenticated: false,
+      userGarage: [],
+      activeVehicle: null,
+    };
+    emitChange();
+  },
+
+  // NEW: Vehicle Actions
+  setGarage: (garage: UserVehicle[]) => {
+    const activeCar = garage.find(v => v.is_active) || null;
+    authState = {
+      ...authState,
+      userGarage: garage,
+      activeVehicle: activeCar
+    };
+    emitChange();
+  },
+
+  switchActiveVehicle: (vehicleId: number) => {
+    // 1. Update the list locally to reflect the switch
+    const updatedGarage = authState.userGarage.map(v => ({
+        ...v,
+        is_active: v.id === vehicleId
+    }));
+    
+    // 2. Set the active object
+    const newActive = updatedGarage.find(v => v.id === vehicleId) || null;
+
+    authState = {
+        ...authState,
+        userGarage: updatedGarage,
+        activeVehicle: newActive
     };
     emitChange();
   },
@@ -77,11 +121,12 @@ function emitChange() {
 }
 
 // Server Snapshot
-// Server Snapshot
 const serverSnapshot: AuthState = {
   user: null,
   isAuthenticated: false,
   activeAuthTab: 'customer',
+  userGarage: [],
+  activeVehicle: null,
 };
 
 const getServerSnapshot = (): AuthState => serverSnapshot;
