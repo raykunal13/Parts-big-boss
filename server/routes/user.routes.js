@@ -1,0 +1,13 @@
+import { Router } from "express";
+import { registerUser, loginUser, logoutUser, refreshAccessToken, getUserProfile } from "../controllers/user.controller.js";
+import { verifyJWT } from "../middleware/verifyJWT.js";
+
+const router = Router();
+
+router.route("/register").post(registerUser);
+router.route("/login").post(loginUser);
+router.route("/logout").post(verifyJWT, logoutUser);
+router.route("/refresh").post(refreshAccessToken);
+router.route("/me").get(verifyJWT, getUserProfile);
+
+export default router;

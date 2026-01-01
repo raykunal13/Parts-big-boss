@@ -1,26 +1,184 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ================================
+  
+     CORE BRAND COLORS
+     ================================ */
+  --base-dark: #3a2525;       /* warm near-black - used for text now */
+  --base-light: #ffffff;      /* NEW: white base */
+  --brand-red: #9e2a3a;       /* primary automotive red */
+  --brand-red-hot: #ff0000;   /* high-energy accent */
+  --brand-navy: #000080;      /* deep navy */
+
+  /* ================================
+     DERIVED SHADES
+     ================================ */
+  --base-dark-soft: #2f1d1d;
+  --base-dark-hover: #463030;
+
+  --red-hover: #b83344;
+  --red-soft: rgba(158, 42, 58, 0.25);
+
+  --navy-soft: rgba(0, 0, 128, 0.25);
+
+  /* ================================
+     TEXT COLORS
+     ================================ */
+  --text-primary: #3a2525;    /* Now dark */
+  --text-secondary: #5a4a4a;
+  --text-muted: #888888;
+
+  /* ================================
+     SEMANTIC TOKENS
+     ================================ */
+  --background: var(--base-light);
+  --foreground: var(--text-primary);
+  --surface: #f8f8f8;
+  --surface-hover: #eeeeee;
+  --border: rgba(58, 37, 37, 0.1);
+
+  --accent: var(--brand-red);
+  --accent-hover: var(--red-hover);
+  --accent-soft: var(--red-soft);
+
+  --info: var(--brand-navy);
+  --info-soft: var(--navy-soft);
+
+  --danger: var(--brand-red-hot);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-accent: var(--accent);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-info: var(--info);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  /* ================================
+     GLOBAL STYLES
+     ================================ */
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-radley), serif;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* ================================
+     LINKS
+     ================================ */
+
+  a {
+    color: var(--info);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  a:hover {
+    color: var(--accent);
+  }
+
+  /* ================================
+     BUTTONS
+     ================================ */
+
+  button {
+    color: #ffffff;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-weight: 600;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+  }
+
+  button:hover {
+    background-color: var(--surface-hover);
+  }
+
+  button:active {
+    transform: scale(0.97);
+  }
+
+  /* Secondary / Info Button */
+  button.secondary {
+    background-color: transparent;
+    color: var(--info);
+    border: 1px solid var(--info);
+  }
+
+  button.secondary:hover {
+    background-color: var(--info-soft);
+  }
+
+  /* ================================
+     HEADINGS
+     ================================ */
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    /* color: var(--accent); */
+    margin-bottom: 0.5em;
+  }
+
+  /* ================================
+     FORMS & INPUTS
+     ================================ */
+
+  input,
+  textarea,
+  select {
+    background-color: var(--surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 1rem;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--text-muted);
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+
+  /* Navy focus utility (optional) */
+  input.info:focus {
+    border-color: var(--info);
+    box-shadow: 0 0 0 3px var(--info-soft);
+  }
+
+  /* ================================
+     CODE BLOCKS
+     ================================ */
+
+  code {
+    background-color: var(--surface-hover);
+    color: var(--brand-red-hot);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-family: var(--font-geist-mono, monospace);
+  }
+
+  pre {
+    background-color: var(--surface);
+    color: var(--brand-red-hot);
+    padding: 16px;
+    border-radius: 14px;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+  }
 }
