@@ -43,15 +43,17 @@ class VehicleCategoryService {
     }
   }
 
-  async getYears(modelId: number): Promise<number[]> {
+  async getYears(modelId: number): Promise<any[]> {
     // 1. Check if we have years specifically for THIS modelId
+    console.log(modelId);
     if (this.years[modelId]) return this.years[modelId];
 
     // 2. If not, fetch only this model's years
     try {
-      const response = await axios.get<number[]>(
+      const response = await axios.get<any[]>(
         `${API_URL}/api/vehicles/years/${modelId}`
       );
+      console.log(response);
       this.years[modelId] = response.data;
       return this.years[modelId];
     } catch (error) {

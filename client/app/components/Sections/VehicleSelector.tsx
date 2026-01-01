@@ -13,6 +13,7 @@ export interface VehicleSelection {
   year: string;
   makeName?: string;
   modelName?: string;
+  variantId?: string;
 }
 
 interface VehicleSelectorProps {
@@ -31,7 +32,7 @@ export default function VehicleSelector({
   // State
   const [makes, setMakes] = useState<Make[]>(initialMakes);
   const [models, setModels] = useState<Model[]>([]);
-  const [years, setYears] = useState<number[]>([]);
+  const [years, setYears] = useState<any[]>([]);
 
   const [selectedMake, setSelectedMake] = useState("");
   const [selectedModel, setSelectedModel] = useState("");
@@ -78,6 +79,7 @@ export default function VehicleSelector({
     const loadYears = async () => {
       setIsLoadingYears(true);
       const data = await vehicleCategoryInfo.getYears(Number(selectedModel));
+      console.log(data);
       setYears(data);
       setIsLoadingYears(false);
     };
@@ -97,6 +99,7 @@ export default function VehicleSelector({
       // Find names for convenience (optional)
       makeName: makes.find(m => m.id.toString() === selectedMake)?.name,
       modelName: models.find(m => m.id.toString() === selectedModel)?.name,
+      variantId: selectedYear,
     };
 
     if (onConfirm) {
@@ -171,9 +174,13 @@ export default function VehicleSelector({
             className="w-full appearance-none bg-[var(--surface)] text-gray-900 border border-gray-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] disabled:opacity-50 disabled:bg-gray-50"
           >
             <option value="">{isLoadingYears ? "Loading..." : "Select Year"}</option>
-            {years.map((year) => (
-              <option key={year} value={year}>{year}</option>
-            ))}
+           {years.map((item) => (
+            console.log(item),
+  // Value is now the ID (e.g., 1), but User sees "2018"
+  <option key={`${item.variant_id}-${item.year}`} value={item.variant_id}>
+    {item.year} {item.submodel ? `(${item.submodel})` : ""}
+  </option>
+))}
           </select>
         </div>
 

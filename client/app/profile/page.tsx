@@ -15,6 +15,8 @@ import {
 import Link from "next/link";
 import { useAuthStore, authStore } from "../store/useAuthStore";
 import VehicleSelector from "../components/Sections/VehicleSelector"; 
+import axios from "axios"; // Import axios
+import { toast } from "sonner"; // Or your notification library
 
 export default function ProfileDashboard() {
 
@@ -209,19 +211,57 @@ export default function ProfileDashboard() {
       {/* Add Vehicle Modal Placeholder */}
       {/* You would wrap your VehicleSelector component in a standardized Modal here */}
       {isAddingCar && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-           <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-2xl">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-lg">Add to Garage</h3>
-                <button onClick={() => setIsAddingCar(false)} className="text-gray-400 hover:text-black">Close</button>
-              </div>
-              <div className="mt-2 text-left">
-                 <VehicleSelector />
-              </div>
-           </div>
-        </div>
-      )}
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-2xl">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-bold text-lg">Add to Garage</h3>
+        <button onClick={() => setIsAddingCar(false)} className="text-gray-400 hover:text-black">
+          Close
+        </button>
+      </div>
+      
+      <div className="mt-2 text-left">
+        {/* THE MAGIC FIX IS HERE */}
+        <VehicleSelector 
+           variant="modal" // Makes it look cleaner
+           onConfirm={async (selection) => {
+             try {
+               // 1. Call your Backend API to add the vehicle
+               // (This matches your userVehicle.controller.js logic)
+               console.log(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/user/vehicles`, {
+                   vehicle_variant_id: selection.variantId, // Assuming 'year' value is actually the variant ID based on your selector logic
+                   nickname: `${selection.makeName} ${selection.modelName}` // Optional default nickname
+                 });
+               await axios.post(
+                 `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/user/vehicles`,
+                 {
+                   variantId: selection.variantId, // Assuming 'year' value is actually the variant ID based on your selector logic
+                   nickname: `${selection.makeName} ${selection.modelName}` // Optional default nickname
+                 },
+                 { withCredentials: true }
+               );
+
+               // 2. Success Feedback
+               alert("Vehicle Added Successfully!"); // Replace with toast.success()
+               
+               // 3. Refresh the garage list (if you have a refresh function)
+               // bootstrapAuth(); 
+               
+               // 4. Close Modal
+               setIsAddingCar(false);
+
+             } catch (error) {
+               console.error("Failed to add vehicle", error);
+               alert("Failed to add vehicle");
+             }
+           }}
+        />
+      </div>
+    </div>
+  </div>
+)}
 
     </div>
+
   );
 }

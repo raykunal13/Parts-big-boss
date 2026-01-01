@@ -38,19 +38,24 @@ const getModels = asyncHandler(async (req, res) => {
 const getYears = asyncHandler(async (req, res) => {
   const { model_id } = req.params;
   if (!model_id) throw new AppError("Model ID is required", 400);
-  const cachedYears = await redisClient.get(`years:${model_id}`);
-  if (cachedYears) {
-    return res.json(JSON.parse(cachedYears));
+
+  const cachedData = await redisClient.get(`years:${model_id}`);
+  if (cachedData) {
+    return res.json(JSON.parse(cachedData));
   }
-  const query = `SELECT DISTINCT year
-            FROM vehicle_variants, 
-                 generate_series(year_from, year_to) as year
-            WHERE model_id = $1
-            ORDER BY year DESC`;
+
+  const query = `
+    SELECT v.id as variant_id, s.year, v.submodel
+    FROM vehicle_variants v,
+    generate_series(v.year_from, v.year_to) as s(year)
+    WHERE v.model_id = $1
+    ORDER BY s.year DESC
+  `;
+
   const result = await pool.query(query, [model_id]);
-  const years = result.rows.map((row) => row.year);
-  await redisClient.set(`years:${model_id}`, JSON.stringify(years),"EX",86400);
-  res.json(years);
+
+  await redisClient.set(`years:${model_id}`, JSON.stringify(result.rows), "EX", 86400);
+  res.json(result.rows);
 });
 
 export { getCompanies, getModels, getYears };
